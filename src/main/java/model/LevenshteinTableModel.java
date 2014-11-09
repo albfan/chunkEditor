@@ -8,6 +8,7 @@ import java.util.Vector;
 
 /**
  * levenstein table model
+ *
  * User: alberto
  * Date: 7/12/12
  * Time: 16:40
@@ -15,6 +16,10 @@ import java.util.Vector;
 public class LevenshteinTableModel extends DefaultTableModel {
     String origin;
     String destiny;
+
+    public LevenshteinTableModel() {
+        this("", "");
+    }
 
     public LevenshteinTableModel(String origin, String destiny) {
         super();

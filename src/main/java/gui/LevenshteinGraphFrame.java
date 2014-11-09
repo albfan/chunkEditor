@@ -1,3 +1,4 @@
+package gui;
 
 import model.LevenshteinTableModel;
 
@@ -17,12 +18,18 @@ import java.util.Iterator;
  * Time: 16:56
  *
  */
-public class LevenshteinGraphFrame {
-    public static void main(String[] args) {
-        JFrame frame = new JFrame();
+public class LevenshteinGraphFrame extends JFrame implements DocumentListener {
+
+    private JTextArea textAreaOrigin;
+    private JTextArea textAreaDestiny;
+    private final LevenshteinTableModel model;
+    private final JSpinner spinner;
+    private final JTable table;
+
+    public LevenshteinGraphFrame() {
         JPanel panel = new JPanel(new GridLayout(1, 2));
-        final JTextArea textAreaOrigin = new JTextArea();
-        final JTextArea textAreaDestiny = new JTextArea();
+        textAreaOrigin = new JTextArea();
+        textAreaDestiny = new JTextArea();
         textAreaOrigin.setPreferredSize(new Dimension(1, 200));
         textAreaDestiny.setPreferredSize(new Dimension(1, 200));
         panel.add(new JScrollPane(textAreaOrigin));
@@ -31,37 +38,15 @@ public class LevenshteinGraphFrame {
         splitPane.setTopComponent(panel);
         splitPane.setContinuousLayout(true);
         splitPane.setDividerLocation(0.1);
-        final LevenshteinTableModel model = new LevenshteinTableModel(textAreaOrigin.getText(), textAreaDestiny.getText());
-        DocumentListener listener = new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                onChange(e);
-            }
+        model = new LevenshteinTableModel();
+        textAreaOrigin.getDocument().addDocumentListener(this);
+        textAreaDestiny.getDocument().addDocumentListener(this);
 
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                onChange(e);
-            }
+        spinner = new JSpinner(new SpinnerNumberModel(15, 5, Integer.MAX_VALUE, 1));
 
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                onChange(e);
-            }
-
-            private void onChange(DocumentEvent e) {
-                model.setOrigin(textAreaOrigin.getText());
-                model.setDestiny(textAreaDestiny.getText());
-            }
-        };
-        textAreaOrigin.getDocument().addDocumentListener(listener);
-        textAreaDestiny.getDocument().addDocumentListener(listener);
-
-        final JSpinner spinner = new JSpinner(new SpinnerNumberModel(15, 5, Integer.MAX_VALUE, 1));
-
-        final JTable table = new JTable(model) {
+        table = new JTable(model) {
             /**
-             *
-             * @return False If the size of the table is not the size of the scroll
+             * @return false If the size of the table is not the size of the scroll
              */
             public boolean getScrollableTracksViewportWidth() {
                 boolean ok = false;
@@ -81,10 +66,9 @@ public class LevenshteinGraphFrame {
                 super.addColumn(aColumn);
             }
 
-      public boolean isCellEditable(int row, int column)
-      {
-        return false;
-      }
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
         };
 
         spinner.addChangeListener(new ChangeListener() {
@@ -108,8 +92,27 @@ public class LevenshteinGraphFrame {
         panelGraph.add(bPanel, BorderLayout.SOUTH);
         splitPane.setBottomComponent(panelGraph);
         table.setFillsViewportHeight(true);
-        frame.getContentPane().add(splitPane);
-        frame.pack();
-        frame.setVisible(true);
+        getContentPane().add(splitPane);
+        pack();
+    }
+
+    @Override
+    public void insertUpdate(DocumentEvent e) {
+        onChange(e);
+    }
+
+    @Override
+    public void removeUpdate(DocumentEvent e) {
+        onChange(e);
+    }
+
+    @Override
+    public void changedUpdate(DocumentEvent e) {
+        onChange(e);
+    }
+
+    private void onChange(DocumentEvent e) {
+        model.setOrigin(textAreaOrigin.getText());
+        model.setDestiny(textAreaDestiny.getText());
     }
 }
