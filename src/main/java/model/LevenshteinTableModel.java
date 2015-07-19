@@ -14,8 +14,14 @@ import java.util.Vector;
  * Time: 16:40
  */
 public class LevenshteinTableModel extends DefaultTableModel {
+    private final Color UNUSED_CELL = Color.BLUE;
+    private final Color NORMAL_BACKGROUND = Color.WHITE;
+    private final Color MATCH_BACKGROUND = Color.ORANGE;
     String origin;
     String destiny;
+
+    public static final int TEXT_COLOR = 0x550099FF;
+    private Color SELECT_BACKGROUND = Color.GREEN;
 
     public LevenshteinTableModel() {
         this("", "");
@@ -107,24 +113,20 @@ public class LevenshteinTableModel extends DefaultTableModel {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component tableCellRendererComponent = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                Color background = Color.WHITE;
+                Color background = NORMAL_BACKGROUND;
                 if (row < 2 && column < 2) {
-                    if (row != 1 || column != 1) {
-                        background = Color.BLUE;
-                    } else {
-                        background = Color.GREEN;
-                    }
+                    background = row == 1 && column == 1 ? SELECT_BACKGROUND : UNUSED_CELL;
                 } else {
                     if (row > 1) {
                         if (column > 1) {
                             if (origin.charAt(row - 2) == destiny.charAt(column - 2)) {
-                                background = Color.ORANGE;
+                                background = MATCH_BACKGROUND;
                             }
                         }
                     }
 
                     if (row == 0 || column == 0) {
-                        background = new Color(0x550099FF, true);
+                        background = new Color(TEXT_COLOR, true);
                     }
                 }
                 tableCellRendererComponent.setBackground(background);
